@@ -1,19 +1,33 @@
-.segment "HEADER"
+; NESADPCM
+; Copyright (C) 2014 Kef Schecter
 ;
+; This code uses the CC0 license, which is nearly equivalent to
+; releasing the code into the public domain. In short, you can use it
+; for nearly any purpose, without attribution. (That said, attribution
+; somewhere is still preferred!) See COPYING.txt included with the
+; NESADPCM distribution.
+
+
+; Set to 1 to use a sampling rate of 4000 Hz instead of 6236 Hz
+SRATE_4000 = 0
+
+
+.segment "HEADER"
+
 .byte 'N', 'E', 'S', 'M', $1A               ; ID
 .byte $01                                   ; Version
-.byte 1                                     ; Number of songs
+.byte 2                                     ; Number of songs
 .byte 1                                     ; Start song
-.word $e000
+.word $8000
 .word INIT
 .word PLAY
-.byte "ADPCM demo                     ", 0  ; Name, 32 bytes
-.byte "Kef Schecter                   ", 0  ; Artist, 32 bytes
-.byte "                               ", 0  ; Copyright, 32 bytes
+.byte "ADPCM demo",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+.byte "Kef Schecter",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+.byte "CC0",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 .word $411A                                 ; NTSC speed
 .byte 0, 0, 0, 0, 0, 0, 0, 0                ; Bank values
-.word $4E20                                 ; PAL speed
-.byte 2                                     ; Flags, dual PAL/NTSC
+.word 0                                     ; PAL speed
+.byte 0                                     ; Flags, NTSC only
 .byte 0
 .byte 0,0,0,0                               ; Reserved
 
@@ -56,20 +70,21 @@ StepIndex:          .res 1
 .segment "CODE"
 
 INIT:
+        asl                                 ; indexing into table of 16-bit values
+        tax
+        lda     SampleAddrTbl,x
+        sta     SampleAddrLSB
+        lda     SampleLenTbl,x
+        sta     SampleBytesLeftLSB
+        inx
+        lda     SampleAddrTbl,x
+        sta     SampleAddrMSB
+        lda     SampleLenTbl,x
+        sta     SampleBytesLeftMSB
         rts
 
 ; Remember to clear APU regs when we do non-NSF version
 PLAY:
-        lda     #<SampleData
-        sta     SampleAddrLSB
-        lda     #>SampleData
-        sta     SampleAddrMSB
-
-        lda     #<SampleDataSize
-        sta     SampleBytesLeftLSB
-        lda     #>SampleDataSize
-        sta     SampleBytesLeftMSB
-
         jsr     PlayAdpcm
         rts
 
@@ -116,23 +131,27 @@ PlayAdpcm:
         lsr
         jsr     HandleAdpcmCode
 
+.if SRATE_4000
         ; wait about 160 cycles
-        ; @TODO@ -- what if loop crosses page boundary?
+        ; (if the loop happens to cross a page boundary, it will wait rather more)
         ldx     #32
 @wait1:
         dex
         bne     @wait1
+.endif
 
         lda     (SampleAddr),y
         and     #$0f
         jsr     HandleAdpcmCode
 
+.if SRATE_4000
         ; wait about 160 cycles
-        ; @TODO@ -- what if loop crosses page boundary?
+        ; (if the loop happens to cross a page boundary, it will wait rather more)
         ldx     #32
 @wait2:
         dex
         bne     @wait2
+.endif
 
         ; decrement SampleBytesLeft and quit if zero
         ; 16-bit decrement taken from http://6502org.wikidot.com/software-incdec#toc2
@@ -250,7 +269,21 @@ AdpcmAdjustTbl:
         .byte -1, -1, -1, -1, 2, 4, 6, 8
 
 
-SampleData:
-        .incbin "dk-roar-sm.raw"
-SampleDataEnd:
-SampleDataSize = SampleDataEnd - SampleData
+SampleAddrTbl:
+        .word   Sample1
+        .word   Sample2
+
+SampleLenTbl:
+        .word   Sample1Len
+        .word   Sample2Len
+
+
+Sample1:
+        .incbin "raws/kablammo-6236.raw"
+Sample1End:
+Sample1Len = Sample1End - Sample1
+
+Sample2:
+        .incbin "raws/dk-roar-6236.raw"
+Sample2End:
+Sample2Len = Sample2End - Sample2

@@ -1,5 +1,5 @@
 # NESADPCM
-A VOX ADPCM (a.k.a. Dialogic ADPCM or OKI ADPCM) decoder for the NES. It may or may not be adaptable to other 6502-based systems.
+A VOX ADPCM (a.k.a. Dialogic ADPCM or OKI ADPCM) decoder for the NES. It may or may not be adaptable to other 6502-based systems. The code is written for ca65, but should be easily adaptable to other assemblers.
 
 To avoid confusion, in this document, the term "sound clip" will be to used to refer to, well, sound clips. The term "sample" will refer not to a sound clip, but rather the samples sent to the DAC.
 
@@ -19,4 +19,6 @@ Converting your samples to VOX ADPCM is easy! For our example, we're going to us
 
 First, load your sample in Audacity. Then, in the bottom-left corner of your screen, click the "Project Rate (Hz)" and type in the playback rate of the engine. For instance, if you're using the engine's maximum playback rate, type 6236.
 
-Next, go to `File->Export...`, then _before_ you save, click the `Options...` button in the dialog box. Choose "RAW (header-less)" for the header and "VOX ADPCM" for the encoding. Now save your file and voila!
+Next, go to `File->Export...`, then _before_ you save, set "Save as type" to "Other uncompressed files", then click the `Options...` button in the dialog box. Choose "RAW (header-less)" for the header and "VOX ADPCM" for the encoding. Now save your file and voila!
+
+Sometimes this may produce a dialog box claiming an error of "No error". Don't worry; it probably still worked fine.
