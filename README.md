@@ -5,7 +5,7 @@ To avoid confusion, in this document, the term "sound clip" will be to used to r
 
 The code currently has a maximum playback rate of about 6236 Hz. This can be reduced by inserting delays between samples, allowing you to use smaller sound clips to save space. The playback engine is not perfectly timed and so the playback rate is slightly unsteady. For practical purposes, however, it is good enough.
 
-To save time, the program does not bother checking if the waveform clips. If you're getting horrible distortion artifacts, check to make sure your waveform is not clipping. If it is, try making it a tad quieter.
+To save time, the program does not bother checking if the waveform clips. If you're getting horrible distortion, try reducing volume by about 1 or 2 dB.
 
 This program hogs the CPU; you cannot do anything while a sample is playing if you're using the maximum playback rate. If you're playing at, say, 4000 Hz, you get about 160 cycles of time between samples to do whatever it is.
 
