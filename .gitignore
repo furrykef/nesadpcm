@@ -5,6 +5,9 @@
 # Build junk
 *.o
 
+# FCEUX junk
+*.deb
+
 
 # rest of file is standard .gitignore
 

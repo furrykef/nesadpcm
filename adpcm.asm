@@ -12,29 +12,7 @@
 SRATE_4000 = 0
 
 
-.segment "HEADER"
-
-.byte 'N', 'E', 'S', 'M', $1A               ; ID
-.byte $01                                   ; Version
-.byte 4                                     ; Number of songs
-.byte 1                                     ; Start song
-.word $8000
-.word INIT
-.word PLAY
-.byte "ADPCM demo",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-.byte "Kef Schecter",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-.byte "CC0",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-.word $411A                                 ; NTSC speed
-.byte 0, 0, 0, 0, 0, 0, 0, 0                ; Bank values
-.word 0                                     ; PAL speed
-.byte 0                                     ; Flags, NTSC only
-.byte 0
-.byte 0,0,0,0                               ; Reserved
-
-
 .segment "ZEROPAGE"
-
-SongID:             .res 1                  ; only needed for NSF driver
 
 SampleAddr:
 SampleAddrLSB:      .res 1
@@ -52,10 +30,6 @@ StepSize:
 StepSizeLSB:        .res 1
 StepSizeMSB:        .res 1
 
-ShiftedStepSize:
-ShiftedStepSizeLSB: .res 1
-ShiftedStepSizeMSB: .res 1
-
 Delta:
 DeltaLSB:           .res 1
 DeltaMSB:           .res 1
@@ -70,35 +44,6 @@ StepIndex:          .res 1
 
 
 .segment "CODE"
-
-INIT:
-        sta     SongID
-        asl                                 ; indexing into table of 16-bit values
-        tax
-        lda     SampleAddrTbl,x
-        sta     SampleAddrLSB
-        lda     SampleLenTbl,x
-        sta     SampleBytesLeftLSB
-        inx
-        lda     SampleAddrTbl,x
-        sta     SampleAddrMSB
-        lda     SampleLenTbl,x
-        sta     SampleBytesLeftMSB
-        rts
-
-; Remember to clear APU regs when we do non-NSF version
-PLAY:
-        jsr     PlayAdpcm
-        ldx     SongID
-        lda     SampleLoopTbl,x
-@forever:
-        beq     @forever                    ; do nothing if sample does not loop
-
-        ; sample loops
-        lda     SongID
-        jsr     INIT
-        jmp     PLAY
-
 
 ; Unsigned 16-bit shift
 .macro lsr16    var
@@ -143,9 +88,9 @@ PlayAdpcm:
         jsr     HandleAdpcmCode
 
 .if SRATE_4000
-        ; wait about 160 cycles
+        ; wait about 166 cycles
         ; (if the loop happens to cross a page boundary, it will wait rather more)
-        ldx     #32
+        ldx     #33
 @wait1:
         dex
         bne     @wait1
@@ -158,7 +103,7 @@ PlayAdpcm:
 .if SRATE_4000
         ; wait about 160 cycles
         ; (if the loop happens to cross a page boundary, it will wait rather more)
-        ldx     #32
+        ldx     #33
 @wait2:
         dex
         bne     @wait2
@@ -193,12 +138,10 @@ HandleAdpcmCode:
         tax
         lda     AdpcmStepTbl,x
         sta     StepSizeLSB
-        sta     ShiftedStepSizeLSB
         sta     ErrorLSB
         inx
         lda     AdpcmStepTbl,x
         sta     StepSizeMSB
-        sta     ShiftedStepSizeMSB
         sta     ErrorMSB
 
         ; Error /= 8
@@ -209,17 +152,17 @@ HandleAdpcmCode:
         lda     #$04
         bit     Code
         beq     :+
-        add16   Error, ShiftedStepSize
-:       lsr16   ShiftedStepSize
+        add16   Error, StepSize
+:       lsr16   StepSize
         lda     #$02
         bit     Code
         beq     :+
-        add16   Error, ShiftedStepSize
-:       lsr16   ShiftedStepSize
+        add16   Error, StepSize
+:       lsr16   StepSize
         lda     #$01
         bit     Code
         beq     :+
-        add16   Error, ShiftedStepSize
+        add16   Error, StepSize
 :
         lda     #$08
         bit     Code
@@ -278,43 +221,3 @@ AdpcmStepTbl:
 
 AdpcmAdjustTbl:
         .byte -1, -1, -1, -1, 2, 4, 6, 8
-
-
-SampleAddrTbl:
-        .word   Sample1
-        .word   Sample2
-        .word   Sample3
-        .word   Sample4
-
-SampleLenTbl:
-        .word   Sample1Len
-        .word   Sample2Len
-        .word   Sample3Len
-        .word   Sample4Len
-
-SampleLoopTbl:
-        .byte   0
-        .byte   0
-        .byte   0
-        .byte   1
-
-
-Sample1:
-        .incbin "raws/kablammo-6236.raw"
-Sample1End:
-Sample1Len = Sample1End - Sample1
-
-Sample2:
-        .incbin "raws/scout-6236.raw"
-Sample2End:
-Sample2Len = Sample2End - Sample2
-
-Sample3:
-        .incbin "raws/dk-roar-6236.raw"
-Sample3End:
-Sample3Len = Sample3End - Sample3
-
-Sample4:
-        .incbin "raws/beatles-6236.raw"
-Sample4End:
-Sample4Len = Sample4End - Sample4
