@@ -20,7 +20,8 @@
 
 .segment "ZEROPAGE"
 
-SongID:             .res 1                  ; only needed for NSF driver
+SongID:             .res 1
+Done:               .res 1
 
 
 .segment "CODE"
@@ -38,20 +39,29 @@ INIT:
         sta     SampleAddrMSB
         lda     SampleLenTbl,x
         sta     SampleBytesLeftMSB
+        lda     #0
+        sta     Done
         rts
 
-; Remember to clear APU regs when we do non-NSF version
+
 PLAY:
+        lda     Done
+        bne     @done
+
         jsr     PlayAdpcm
         ldx     SongID
         lda     SampleLoopTbl,x
-@forever:
-        beq     @forever                    ; do nothing if sample does not loop
+        beq     @done                       ; if sample desn't loop, well, don't loop
 
         ; sample loops
         lda     SongID
         jsr     INIT
-        jmp     PLAY
+        rts
+
+@done:
+        lda     #1
+        sta     Done
+        rts
 
 
 SampleAddrTbl:

@@ -12,16 +12,16 @@ The mode can be changed by changing the `SPEED` variable in `adpcm.asm`. Note th
 
 In all modes, the sampling rate can be reduced by inserting delays between samples, allowing you to use smaller sound clips to save space. The playback engine is not perfectly timed, especially in the slower modes, and so the playback rate may be slightly unsteady. For practical purposes, however, it is good enough.
 
-To save time, the program does not bother checking if the waveform clips. If you're getting clicks or pops, try reducing volume by about 1 or 2 dB.
+To save time, the program does not bother checking if the waveform clips. If you're getting clicks or pops, try reducing volume by 1 or 2 dB.
 
-This program hogs the CPU; you cannot do anything while a sample is playing if you're using the maximum playback rate. If you're playing at, say, 4000 Hz, you get about 160 cycles of time between samples to do whatever it is.
+This program hogs the CPU; you cannot do anything while a sample is playing if you're using the maximum playback rate. If you're playing at, say, 4000 Hz, you get about 166 cycles of time between samples to do whatever it is.
 
 VOX ADPCM is admittedly not the ideal format for playing on 8-bit systems with 7-bit audio. Each sample is actually decoded as 12-bit even though only the 7 most significant bits are heard. This means the program does a fair bit of 16-bit math. A codec that requires only 8-bit math to decode could run significantly faster and so yield a higher maximum sampling rate. But I wanted an ADPCM solution and I wanted it now, and it seemed easier to adapt readily available VOX ADPCM code in C than to find another solution.
 
 Do note that the code doesn't bother to reset $4011 to zero after playing a sample. This means your triangle and noise channels might be a little quiet until you poke a new value into $4011.
 
 
-## Producing VOX ADPCM samples
+## Creating VOX ADPCM samples
 Converting your samples to VOX ADPCM is easy! For our example, we're going to use [Audacity](audacity.sourceforge.net), but other tools can be used.
 
 First, load your sample in Audacity. Then, in the bottom-left corner of your screen, click the "Project Rate (Hz)" and type in the playback rate of the engine. For instance, if you're using the maximum playback rate of the engine's slow mode, type 6351.
