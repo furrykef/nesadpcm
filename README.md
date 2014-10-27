@@ -3,9 +3,16 @@ A VOX ADPCM (a.k.a. Dialogic ADPCM or OKI ADPCM) decoder for the NES. It may or 
 
 To avoid confusion, in this document, the term "sound clip" will be to used to refer to, well, sound clips. The term "sample" will refer not to a sound clip, but rather the samples sent to the DAC.
 
-The code currently has a maximum playback rate of about 6369 Hz. This can be reduced by inserting delays between samples, allowing you to use smaller sound clips to save space. The playback engine is not perfectly timed and so the playback rate is slightly unsteady. For practical purposes, however, it is good enough.
+The engine has three primary modes, numbered 0 through 2, which we might call "slow", "faster", and "fastest". Each level of speed adds more performance at the expense of size (roughly 400 bytes per level). Maximum playback rates are as follows:
+* Slow mode: 6351 Hz
+* Faster mode: 8470 Hz
+* Fastest mode: 8948 Hz
 
-To save time, the program does not bother checking if the waveform clips. If you're getting horrible distortion, try reducing volume by about 1 or 2 dB.
+The mode can be changed by changing the `SPEED` variable in `adpcm.asm`. Note that sound clips can be big enough that you might not want much more than 6000 Hz anyway, in which case you may as well use slow mode.
+
+In all modes, the sampling rate can be reduced by inserting delays between samples, allowing you to use smaller sound clips to save space. The playback engine is not perfectly timed, especially in the slower modes, and so the playback rate may be slightly unsteady. For practical purposes, however, it is good enough.
+
+To save time, the program does not bother checking if the waveform clips. If you're getting clicks or pops, try reducing volume by about 1 or 2 dB.
 
 This program hogs the CPU; you cannot do anything while a sample is playing if you're using the maximum playback rate. If you're playing at, say, 4000 Hz, you get about 160 cycles of time between samples to do whatever it is.
 
@@ -17,7 +24,7 @@ Do note that the code doesn't bother to reset $4011 to zero after playing a samp
 ## Producing VOX ADPCM samples
 Converting your samples to VOX ADPCM is easy! For our example, we're going to use [Audacity](audacity.sourceforge.net), but other tools can be used.
 
-First, load your sample in Audacity. Then, in the bottom-left corner of your screen, click the "Project Rate (Hz)" and type in the playback rate of the engine. For instance, if you're using the engine's maximum playback rate, type 6369.
+First, load your sample in Audacity. Then, in the bottom-left corner of your screen, click the "Project Rate (Hz)" and type in the playback rate of the engine. For instance, if you're using the maximum playback rate of the engine's slow mode, type 6351.
 
 Next, go to `File->Export...`, then _before_ you save, set "Save as type" to "Other uncompressed files", then click the `Options...` button in the dialog box. Choose "RAW (header-less)" for the header and "VOX ADPCM" for the encoding. Now save your file and voila!
 
@@ -29,6 +36,6 @@ This is not necessary unless you modify the engine in some way.
 
 Use FCEUX and break on writes to $4011. Ignore the first write and click "Run" to continue until it hits the watchpoint again. Somewhere in the middle of the right pane it should say "CPU cycles". Ignore the big number, but pay attention to the number in parentheses. It should say something like "(+288)". That's how many cycles it ran since the last break. Record several of these numbers in a row and average them. Then you have your average sampling rate in cycles.
 
-To get a figure in Hz, use the formula 1,789,773 / cycles. (The NES runs at 1.789773 MHz.) For instance, if the average sampling rate is 281 cycles per sample, then the playback rate will be about 6369 Hz.
+To get a figure in Hz, use the formula 1,789,773 / cycles. (The NES runs at 1.789773 MHz.) For instance, if the average sampling rate is 281.8 cycles per sample, then the playback rate will be about 6351 Hz.
 
-Suppose 6369 Hz sound clips take up too much space and you decide you'd be content with 4000 Hz sound clips. (Probably no good for human voices, but it may work fine for other things.) Then you can use the formula 1,789,773 / Hz to get the number of cycles you need per sample. 1,789,773 / 4000 = 447. Since the loop runs at 281 cycles per sample, you need to insert a delay of 447 - 281 = 166 clocks after each sample. An example loop is already in place in the code and will be used if you change `SRATE_4000` to 1 at the top.
+Suppose 6351 Hz sound clips take up too much space and you decide you'd be content with 4000 Hz sound clips. (Probably no good for human voices, but it may work fine for other things.) Then you can use the formula 1,789,773 / Hz to get the number of cycles you need per sample. 1,789,773 / 4000 = 447. Since the loop runs at 281 cycles per sample, you need to insert a delay of 447 - 281 = 166 clocks after each sample. An example loop is already in place in the code and will be used if you change `SRATE_4000` to 1 at the top.
