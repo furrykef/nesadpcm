@@ -11,7 +11,7 @@
 .byte "Kef Schecter",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 .byte "CC0",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 .word $411A                                 ; NTSC speed
-.byte 0, 0, 0, 0, 0, 0, 0, 0                ; Bank values
+.byte 0, 1, 2, 3, 4, 5, 6, 7                ; Bank values
 .word 0                                     ; PAL speed
 .byte 0                                     ; Flags, NTSC only
 .byte 0
@@ -28,6 +28,21 @@ Done:               .res 1
 
 INIT:
         sta     SongID
+        tax
+        ldy     SampleBankTbl,x
+        sty     $5ff9                       ; set up banks
+        iny
+        sty     $5ffa
+        iny
+        sty     $5ffb
+        iny
+        sty     $5ffc
+        iny
+        sty     $5ffd
+        iny
+        sty     $5ffe
+        iny
+        sty     $5fff
         asl                                 ; indexing into table of 16-bit values
         tax
         lda     SampleAddrTbl,x
@@ -70,6 +85,12 @@ SampleAddrTbl:
         .word   Sample3
         .word   Sample4
 
+SampleBankTbl:
+        .byte   1
+        .byte   8
+        .byte   8
+        .byte   8
+
 SampleLenTbl:
         .word   Sample1Len
         .word   Sample2Len
@@ -83,23 +104,25 @@ SampleLoopTbl:
         .byte   1
 
 
+.segment "ADPCM0"
 Sample1:
-        .incbin "raws/kablammo-6236.raw"
+        .incbin "raws/kablammo-8948.raw"
 Sample1End:
 Sample1Len = Sample1End - Sample1
 
+.segment "ADPCM1"
 Sample2:
-        .incbin "raws/scout-6236.raw"
+        .incbin "raws/scout-8948.raw"
 Sample2End:
 Sample2Len = Sample2End - Sample2
 
 Sample3:
-        .incbin "raws/dk-roar-6236.raw"
+        .incbin "raws/dk-roar-8948.raw"
 Sample3End:
 Sample3Len = Sample3End - Sample3
 
 Sample4:
-        .incbin "raws/beatles-6236.raw"
+        .incbin "raws/beatles-8948.raw"
 Sample4End:
 Sample4Len = Sample4End - Sample4
 

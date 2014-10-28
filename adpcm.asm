@@ -14,7 +14,7 @@ SRATE_4000 = 0
 ; 0: slowest; saves the most space
 ; 1: faster, but adds over 420 bytes to the ROM
 ; 2: slightly faster still, but adds over 380 bytes more
-SPEED = 0
+SPEED = 2
 
 
 .segment "ZEROPAGE"
