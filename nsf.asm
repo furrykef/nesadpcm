@@ -1,3 +1,6 @@
+.include "adpcm.asm"
+
+
 .segment "HEADER"
 
 .byte 'N', 'E', 'S', 'M', $1A               ; ID
@@ -125,6 +128,3 @@ Sample4:
         .incbin "raws/beatles-8948.raw"
 Sample4End:
 Sample4Len = Sample4End - Sample4
-
-
-.include "adpcm.asm"
