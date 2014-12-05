@@ -1,3 +1,10 @@
+; Demo sounds:
+;   1: Homer Simpson from The Simpsons
+;   2: The Scout from Team Fortress 2
+;   3: Donkey Kong from Mario Kart 64
+;   4: "Make your selection now" from Action 53, voiced by tepples
+;   5: Drum loop from Sgt. Pepper Reprise by The Beatles
+
 .include "adpcm.asm"
 
 
@@ -5,14 +12,14 @@
 
 .byte 'N', 'E', 'S', 'M', $1A               ; ID
 .byte $01                                   ; Version
-.byte 4                                     ; Number of songs
+.byte 5                                     ; Number of songs
 .byte 1                                     ; Start song
 .word $8000
 .word INIT
 .word PLAY
 .byte "ADPCM demo",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 .byte "Kef Schecter",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-.byte "CC0",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+.byte "CC0 (code only)",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 .word $411A                                 ; NTSC speed
 .byte 0, 1, 2, 3, 4, 5, 6, 7                ; Bank values
 .word 0                                     ; PAL speed
@@ -87,9 +94,11 @@ SampleAddrTbl:
         .word   Sample2
         .word   Sample3
         .word   Sample4
+        .word   Sample5
 
 SampleBankTbl:
         .byte   1
+        .byte   8
         .byte   8
         .byte   8
         .byte   8
@@ -99,8 +108,10 @@ SampleLenTbl:
         .word   Sample2Len
         .word   Sample3Len
         .word   Sample4Len
+        .word   Sample5Len
 
 SampleLoopTbl:
+        .byte   0
         .byte   0
         .byte   0
         .byte   0
@@ -125,6 +136,11 @@ Sample3End:
 Sample3Len = Sample3End - Sample3
 
 Sample4:
-        .incbin "raws/beatles-8948.raw"
+        .incbin "raws/selnow-8948.raw"
 Sample4End:
 Sample4Len = Sample4End - Sample4
+
+Sample5:
+        .incbin "raws/beatles-8948.raw"
+Sample5End:
+Sample5Len = Sample5End - Sample5
