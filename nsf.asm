@@ -121,26 +121,21 @@ SampleLoopTbl:
 .segment "ADPCM0"
 Sample1:
         .incbin "raws/kablammo-8948.raw"
-Sample1End:
-Sample1Len = Sample1End - Sample1
+Sample1Len = * - Sample1
 
 .segment "ADPCM1"
 Sample2:
         .incbin "raws/scout-8948.raw"
-Sample2End:
-Sample2Len = Sample2End - Sample2
+Sample2Len = * - Sample2
 
 Sample3:
         .incbin "raws/dk-roar-8948.raw"
-Sample3End:
-Sample3Len = Sample3End - Sample3
+Sample3Len = * - Sample3
 
 Sample4:
         .incbin "raws/selnow-8948.raw"
-Sample4End:
-Sample4Len = Sample4End - Sample4
+Sample4Len = * - Sample4
 
 Sample5:
         .incbin "raws/beatles-8948.raw"
-Sample5End:
-Sample5Len = Sample5End - Sample5
+Sample5Len = * - Sample5

@@ -8,6 +8,10 @@
 ; NESADPCM distribution.
 
 
+; Allow negative numbers in .byte and .word
+.feature force_range
+
+
 ; Set to 1 to use a sampling rate of 4000 Hz (assuming FAST_MODE is off)
 SRATE_4000 = 0
 
