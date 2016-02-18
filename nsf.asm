@@ -12,7 +12,7 @@
 
 .byte 'N', 'E', 'S', 'M', $1A               ; ID
 .byte $01                                   ; Version
-.byte 5                                     ; Number of songs
+.byte 7                                     ; Number of songs
 .byte 1                                     ; Start song
 .word $8000
 .word INIT
@@ -95,6 +95,8 @@ SampleAddrTbl:
         .word   Sample3
         .word   Sample4
         .word   Sample5
+        .word   Sample6
+        .word   Sample7
 
 SampleBankTbl:
         .byte   1
@@ -102,6 +104,8 @@ SampleBankTbl:
         .byte   8
         .byte   8
         .byte   8
+        .byte   15
+        .byte   22
 
 SampleLenTbl:
         .word   Sample1Len
@@ -109,6 +113,8 @@ SampleLenTbl:
         .word   Sample3Len
         .word   Sample4Len
         .word   Sample5Len
+        .word   Sample6Len
+        .word   Sample7Len
 
 SampleLoopTbl:
         .byte   0
@@ -116,6 +122,8 @@ SampleLoopTbl:
         .byte   0
         .byte   0
         .byte   1
+        .byte   0
+        .byte   0
 
 
 .segment "ADPCM0"
@@ -139,3 +147,13 @@ Sample4Len = * - Sample4
 Sample5:
         .incbin "raws/beatles-8948.raw"
 Sample5Len = * - Sample5
+
+.segment "ADPCM2"
+Sample6:
+        .incbin "raws/fart1-8948.raw"
+Sample6Len = * - Sample6
+
+.segment "ADPCM3"
+Sample7:
+        .incbin "raws/fart2-8948.raw"
+Sample7Len = * - Sample7
